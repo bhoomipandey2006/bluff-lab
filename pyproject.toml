@@ -1,0 +1,19 @@
+[project]
+name = "bluff-lab"
+version = "0.1.0"
+description = "Exact Kuhn poker lab: exploitability, best response, CFR, equilibrium family"
+requires-python = ">=3.11"
+dependencies = ["numpy"]
+[project.optional-dependencies]
+dev = ["pytest", "matplotlib", "open_spiel", "ruff", "fastapi", "httpx", "uvicorn"]
+arena = ["fastapi", "uvicorn"]
+[tool.setuptools]
+packages = ["bluff_lab", "server"]
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+[tool.ruff]
+line-length = 120
+[tool.ruff.lint]
+select = ["E9", "F", "B"]
+ignore = ["B007", "B023", "B905"]

@@ -1,0 +1,2 @@
+# Architecture
+`bluff_lab/game.py` exact engine (payoff, best response, exploitability, equilibrium family, head-to-head). `bluff_lab/cfr.py` CFR, CFR+, external-sampling MCCFR. `web/src/engine.ts` TypeScript port, verified against golden vectors from `scripts/golden.py` (1e-9). `web/src/main.ts` the app (Exploit me, Solver lab, Play, Arena). `server/app.py` arena API recomputing everything from 12 numbers. `scripts/` experiments, figures, FACTS generator. 12-vector order is defined in METHOD.md.

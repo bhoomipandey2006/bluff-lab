@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bluff Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/style.css"></head>
+<body>
+<header class="top"><button class="logo" data-go="home">Bluff Lab</button>
+ <nav aria-label="sections"><button data-go="exploit">Exploit me</button><button data-go="solver">Solver lab</button><button data-go="play">Play</button><button data-go="arena">Arena</button><button data-go="family">Family</button><button data-go="learn">Learn</button></nav>
+ <div id="hearts" aria-label="chips"></div></header>
+<main>
+<section id="home" class="screen on">
+ <div class="hero"><div><h1>Bluff Lab</h1><p class="label">KUHN POKER &nbsp;/&nbsp; EXACT &nbsp;/&nbsp; OPEN SOURCE</p>
+  <p class="lead">Poker, solved exactly. Find out how much you leak, watch a solver learn to bluff, then play it.</p><span class="rule"></span></div>
+  <div><p class="label">CONCEPT</p><ul class="concept"><li>no sampling, no luck in the numbers</li><li>twelve sliders, one perfect opponent</li><li>any bluff rate from 0 to a third can be unexploitable</li></ul></div></div>
+ <div class="frame"><svg viewBox="0 0 640 220" role="img" aria-label="three cards, light to heavy: Jack, Queen, King">
+  <g font-family="inherit" text-anchor="middle"><g class="c"><rect x="90" y="70" width="90" height="116" rx="12" fill="#F6F4EE" stroke="#111" stroke-width="2"/><text x="135" y="140" font-size="40" fill="#111">J</text></g>
+  <g class="c"><rect x="270" y="52" width="100" height="134" rx="13" fill="#BEB8AD" stroke="#111" stroke-width="2"/><text x="320" y="132" font-size="46" fill="#111">Q</text></g>
+  <g class="c"><rect x="460" y="30" width="112" height="156" rx="14" fill="#111"/><text x="516" y="124" font-size="54" fill="#F6F4EE">K</text></g>
+  <path d="M196 128h58m-10-8 10 8-10 8M386 128h58m-10-8 10 8-10 8" stroke="#777" stroke-width="2" fill="none"/></g></svg></div>
+ <div class="strip"><button data-go="exploit"><span class="label">01 / EXPLOIT ME</span><span>Set twelve numbers. See exactly how much a perfect opponent takes.</span></button>
+  <button data-go="solver"><span class="label">02 / SOLVER LAB</span><span>Watch a solver learn when to bluff.</span></button>
+  <button data-go="play"><span class="label">03 / PLAY</span><span>Face opponents at four stages of training.</span></button>
+  <button data-go="arena"><span class="label">04 / ARENA</span><span>Enter your numbers. Ranked with no luck involved.</span></button></div>
+ <p class="note top-gap">New here? <button class="link" data-go="learn">Read the short explainer</button></p>
+</section>
+<section id="exploit" class="screen"><p class="label">01 / EXPLOIT ME</p><h2>How much do you leak?</h2>
+ <p class="note">Each slider is your chance to take the aggressive action (bet or call). You play both seats.</p>
+ <p class="label">PRESETS</p><div id="presets" class="pills"></div>
+ <div class="panel"><div class="split"><span class="label">LEAK</span><span id="badge" class="tag"></span></div><div class="bar" id="meter"></div>
+  <p class="num"><span id="expl100">0</span><span class="unit"> chips lost per 100 hands to a perfect opponent</span></p><p id="expl1" class="note"></p><p id="leak"></p></div>
+ <div id="sliders"></div>
+ <p class="label top-gap">THE COUNTER-STRATEGY</p><div id="br"></div>
+ <button id="card" class="pill solid">Save share card</button></section>
+<section id="solver" class="screen"><p class="label">02 / SOLVER LAB</p><h2>Watch it learn to bluff</h2>
+ <div class="controls"><label class="label" for="iters">CFR+ ITERATIONS</label><select id="iters"><option>100</option><option>1000</option><option selected>10000</option></select><button id="run" class="pill solid">Run</button></div>
+ <div class="panel"><p class="label">BLUFF METER &nbsp;/&nbsp; HOW OFTEN PLAYER 1 BETS A JACK</p><div id="gauge" class="bar"><span id="zone"></span><i id="needle"></i></div><p id="live" class="note"></p></div>
+ <canvas id="chart" width="720" height="380" role="img" aria-label="exploitability versus iterations, log scale"></canvas>
+ <p id="chartcap" class="note"></p><p id="bluff"></p></section>
+<section id="play" class="screen"><p class="label">03 / PLAY</p><h2>One hand at a time</h2>
+ <div class="controls"><label class="label" for="ckpt">OPPONENT TRAINED FOR</label><select id="ckpt"><option>10</option><option>100</option><option>1000</option><option selected>10000</option></select><span class="note">iterations</span><button id="deal" class="pill solid">Deal</button></div>
+ <div id="table" class="panel" aria-live="polite"></div><div id="tally" class="note"></div></section>
+<section id="arena" class="screen"><p class="label">04 / ARENA</p><h2>No luck, only numbers</h2>
+ <p class="note">Submit the twelve numbers on your Exploit me sliders. The server recomputes everything exactly from them and never runs your code.</p>
+ <div class="controls"><input id="nick" maxlength="20" placeholder="nickname" aria-label="nickname"><button id="submit" class="pill solid">Submit my numbers</button><span id="subMsg" class="note"></span></div>
+ <p class="label top-gap">RANKED BY EXPLOITABILITY (LOWER IS BETTER)</p><div id="lbExp"></div>
+ <p class="label top-gap">RANKED BY AVERAGE PAYOFF AGAINST THE FIELD</p><div id="lbPay"></div>
+ <p class="label top-gap">HEAD-TO-HEAD, CHIPS PER HAND (ROW VS COLUMN)</p><div id="matrix"></div></section>
+<section id="family" class="screen"><p class="label">05 / FAMILY EXPLORER</p><h2>There is no single right bluff</h2>
+ <p class="note">Move the first player's bluff rate. The rest of the strategy is set to match the equilibrium family. Past one third, something has to break.</p>
+ <div class="panel"><div class="row"><label for="alpha">bluff rate</label><input id="alpha" type="range" min="0" max="0.6" step="0.005" value="0.1667" style="--p:27.8%"><output id="aout">0.167</output></div>
+  <p class="num"><span id="afx">0.0</span><span class="unit"> chips per 100 hands exploitable</span></p><p id="atxt" class="note"></p><button id="aload" class="pill">Load into Exploit me</button></div>
+ <p class="label top-gap">START 40 SOLVERS FROM RANDOM POINTS</p><div class="controls"><button id="arun" class="pill solid">Run</button><span id="astat" class="note"></span></div>
+ <div id="track" role="img" aria-label="where 40 solver runs ended up along the bluff-rate axis"><span id="tzone"></span></div><p class="note"><span>0</span> bluff rate with a Jack <span style="float:right">0.4</span></p><p id="acap" class="note"></p></section>
+<section id="learn" class="screen"><p class="label">06 / LEARN</p><h2>Kuhn poker in two minutes</h2>
+ <div class="learn"><h3>The game</h3><p>Three cards: Jack, Queen, King. Both players put in one chip and get one card. The first player checks or bets one more chip. If they check, the second player can check too (showdown) or bet. A bet can be folded to or called. Highest card wins at showdown.</p>
+ <h3>A strategy is twelve numbers</h3><p>For each of the twelve situations you can be in, how often do you bet or call? That is all a strategy is, and it is what the sliders in Exploit me set.</p>
+ <h3>Exploitability</h3><p>Hand your twelve numbers to an opponent who knows them and plays the best possible counter. Exploitability is how many chips per hand that costs you beyond perfect play, shown here per 100 hands. It measures the strategy itself, not the crowd it plays against.</p>
+ <h3>The seat is not fair</h3><p>With perfect play from both sides, the first player still loses <b id="lnValue">5.6</b> chips per 100 hands on average. Moving first is a disadvantage in this game.</p>
+ <h3>How the solver learns</h3><p>After each deal it asks, for every choice it made, how much better the other option would have done. It shifts probability toward the options it regrets not choosing, then averages its play over all the rounds. That average gets close to unexploitable. This is regret matching inside CFR, a family of methods poker AIs are built on.</p>
+ <h3>Why bluffing shows up</h3><p>If you bet your King and never bet your Jack, your bet gives the hand away. An opponent who folds everything but a King takes <b id="lnHonest">16.7</b> chips per 100 hands from the player who only bets the King and calls with Queens and Kings. The balance that cannot be exploited bets the King three times as often as the Jack. With any bluff rate from 0 to a third, the numbers can be set to fit.</p>
+ <button id="lnTry" class="pill solid">Load the never-bluffs player into Exploit me</button></div></section>
+<footer class="note">Exact computations, no sampling, except the opponent's dice in Play. Every figure in the repo is listed in docs/FACTS.md.</footer>
+</main><script type="module" src="/src/main.ts"></script></body></html>

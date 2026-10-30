@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Bluff Lab: an exact, interactive Kuhn poker lab"
+authors:
+  - given-names: "Bhoomi"
+    family-names: "TODO"
+license: MIT
+version: 0.1.0
