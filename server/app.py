@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
-from bluff_lab import Strategy, strategy_exploitability
+from bluff_lab import Strategy, equilibrium, strategy_exploitability
 from bluff_lab.game import head_to_head
 
 DB = lambda: os.environ.get("ARENA_DB", "arena.db")  # noqa: E731
@@ -29,6 +29,18 @@ _origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") 
 if _origins:  # needed when the static site and the API live on different hosts
     app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 _cache: dict = {"key": None, "val": None}
+
+# Always-present, clearly labelled house strategies. Computed on the fly, never stored, so the board is
+# never empty even when a free host wipes the database. Same hand-written field as scripts/field_demo.py.
+HOUSE: dict[str, list[float]] = {
+    "House: equilibrium (1/6)": [float(x) for x in equilibrium(1 / 6).to_vector()],
+    "House: never bluffs": [0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1],
+    "House: tight-passive": [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1],
+    "House: bluff-happy": [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+    "House: calling station": [0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1],
+    "House: maniac": [1.0] * 12,
+    "House: coin flip": [0.5] * 12,
+}
 
 
 @app.exception_handler(RequestValidationError)
@@ -75,6 +87,11 @@ def _limited(ip: str) -> bool:
     return False
 
 
+@app.get("/")
+def root():
+    return {"service": "Bluff Lab arena", "status": "running", "leaderboard": "/api/leaderboard", "open the app at": "http://localhost:5173"}
+
+
 @app.post("/api/submit")
 def submit(sub: Submission, request: Request):
     if _limited(request.client.host if request.client else "?"):
@@ -100,17 +117,18 @@ def leaderboard():
     key = (DB(), tuple((r[0], r[2]) for r in rows))  # recompute only when entries change
     if _cache["key"] == key:
         return _cache["val"]
-    strats = [Strategy.from_vector([float(x) for x in r[2].split(",")]) for r in rows]
-    n = len(strats)
+    users = [(r[0], r[1], [float(x) for x in r[2].split(",")], False) for r in rows]
+    field = users + [(-(i + 1), name, v, True) for i, (name, v) in enumerate(HOUSE.items())]
+    strats = [Strategy.from_vector(f[2]) for f in field]
     entries = []
-    for i, (r, s) in enumerate(zip(rows, strats)):
-        others = [head_to_head(s, t) for j, t in enumerate(strats) if j != i]
-        entries.append({"id": r[0], "nickname": r[1], "exploitability": strategy_exploitability(s),
-                        "avg_payoff": sum(others) / len(others) if others else 0.0})
+    for i, f in enumerate(field):
+        others = [head_to_head(strats[i], t) for j, t in enumerate(strats) if j != i]
+        entries.append({"id": f[0], "nickname": f[1], "house": f[3], "exploitability": strategy_exploitability(strats[i]),
+                        "avg_payoff": sum(others) / len(others)})
     matrix = None
-    if 2 <= n <= MATRIX_MAX:
-        matrix = {"names": [r[1] for r in rows], "values": [[head_to_head(a, b) for b in strats] for a in strats]}
-    out = {"entries": entries, "matrix": matrix, "n": n}
+    if 2 <= len(field) <= MATRIX_MAX:
+        matrix = {"names": [f[1] for f in field], "values": [[head_to_head(x, y) for y in strats] for x in strats]}
+    out = {"entries": entries, "matrix": matrix, "n": len(users)}
     _cache["key"], _cache["val"] = key, out
     return out
 

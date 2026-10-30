@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir numpy fastapi uvicorn .
 ENV ARENA_DB=/data/arena.db
 VOLUME /data
 EXPOSE 8000
-CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+CMD ["sh", "-c", "uvicorn server.app:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers"]

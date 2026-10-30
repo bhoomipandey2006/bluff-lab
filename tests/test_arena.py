@@ -21,14 +21,22 @@ def sub(c, name, v): return c.post("/api/submit", json={"nickname": name, "v": l
 def test_scores_are_recomputed_exactly_and_matrix_is_antisymmetric(client):
     rng = np.random.default_rng(5); vs = {f"p{i}": rng.random(12) for i in range(4)}; vs["eq"] = equilibrium(1 / 6).to_vector()
     for k, v in vs.items(): assert sub(client, k, v).status_code == 200
-    d = client.get("/api/leaderboard").json(); S = {k: Strategy.from_vector(v) for k, v in vs.items()}
+    d = client.get("/api/leaderboard").json()
+    S = {k: Strategy.from_vector(v) for k, v in vs.items()}; S.update({k: Strategy.from_vector(v) for k, v in arena.HOUSE.items()})
+    assert len(d["entries"]) == len(S) and d["n"] == 5 and sum(e["house"] for e in d["entries"]) == len(arena.HOUSE)
     for e in d["entries"]:
         s = S[e["nickname"]]; others = [head_to_head(s, t) for k, t in S.items() if k != e["nickname"]]
         assert e["exploitability"] == pytest.approx(strategy_exploitability(s), abs=1e-12)
         assert e["avg_payoff"] == pytest.approx(sum(others) / len(others), abs=1e-12)
     M = np.array(d["matrix"]["values"]); assert np.allclose(M, -M.T, atol=1e-12)
-    assert next(e for e in d["entries"] if e["nickname"] == "eq")["avg_payoff"] >= -1e-12 or True
     assert min(M[d["matrix"]["names"].index("eq")]) >= -1e-12  # equilibrium never loses a match
+
+
+def test_house_strategies_present_when_empty_and_not_deletable(client, monkeypatch):
+    d = client.get("/api/leaderboard").json()
+    assert d["n"] == 0 and len(d["entries"]) == len(arena.HOUSE) and all(e["house"] for e in d["entries"]) and d["matrix"] is not None
+    monkeypatch.setenv("ADMIN_TOKEN", "t")
+    assert client.delete("/api/admin/-1", headers={"x-admin-token": "t"}).json()["deleted"] == 0
 
 
 @pytest.mark.parametrize("name,v", [("ok", [0.5] * 11), ("ok", [0.5] * 13), ("ok", [1.5] + [0.5] * 11), ("ok", [-0.1] + [0.5] * 11),

@@ -137,9 +137,10 @@ $("#ckpt").addEventListener("change", () => { net = played = jHands = jBets = 0;
 
 // ---------- Arena ----------
 const API = ((import.meta as unknown as { env?: { VITE_API?: string } }).env?.VITE_API) ?? "";
-type Entry = { id: number; nickname: string; exploitability: number; avg_payoff: number };
+type Entry = { id: number; nickname: string; house?: boolean; exploitability: number; avg_payoff: number };
 const esc = (x: string) => x.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 async function refresh() {
+  $("#lbExp").innerHTML = `<p class="note">loading... the free server sleeps when idle, so the first load can take a minute.</p>`;
   try {
     const r = await fetch(`${API}/api/leaderboard`); const d: { entries: Entry[]; matrix: { names: string[]; values: number[][] } | null } = await r.json();
     const tbl = (rows: Entry[], f: (e: Entry) => string, h: string) => rows.length ? `<table><tr><th>#</th><th>name</th><th>${h}</th></tr>${rows.map((e, i) => `<tr><td>${i + 1}</td><td>${esc(e.nickname)}</td><td>${f(e)}</td></tr>`).join("")}</table>` : `<p class="note">No entries yet. Be the first.</p>`;

@@ -100,6 +100,7 @@ Does the ranking depend on which equilibrium? Yes. Rank of "Equilibrium" in this
 | Leaderboard exploitability and average payoff are recomputed by the server from the 12 submitted numbers and equal the engine's values | `tests/test_arena.py`, 1e-12 |
 | Head-to-head matrix is antisymmetric (each pair evaluated in both seats and averaged) | same test |
 | Equilibrium never loses a match in the matrix | same test |
+| Seven labelled house strategies are always on the board (computed live, never stored) so a wiped database still leaves a leaderboard | same file |
 | Rejected with 422: wrong length, values outside [0,1], NaN, strings, nicknames over 20 chars or with other characters | same file; found and fixed a bug where a NaN submission crashed the response (now sanitized) |
 | Duplicate nickname 409; more than 10 submissions per minute per IP gets 429; admin delete needs `ADMIN_TOKEN` | same file |
 | Not yet verified: deployment, behaviour under real traffic, Docker image build | not run in my environment |

@@ -15,7 +15,7 @@ Everything is exact (no sampling) unless the row says MCCFR or "random initial r
 | Equilibrium seat guarantees value vs any opponent | 500 random opponents, both seats |
 | Our exploitability and payoff = OpenSpiel (`pyspiel` kuhn_poker), joint policy | 25 random strategies, 1e-9 |
 | Our CFR (3 variants) = OpenSpiel CFR at T = 10, 100, 1000 | relative 1e-6 |
-| Test collection | 44 passed, 2 warnings in 13.01s |
+| Test collection | 45 passed, 2 warnings in 13.27s |
 
 Disagreement found and fixed (not hidden): the first CFR implementation updated regrets inside the tree walk, so later
 deals in the same iteration saw a modified strategy. OpenSpiel parity exposed it (exploitability 0.0065 vs 0.00094 at T=1000).
@@ -87,6 +87,7 @@ Does the ranking depend on which equilibrium? Yes. Rank of "Equilibrium" in this
 | Leaderboard exploitability and average payoff are recomputed by the server from the 12 submitted numbers and equal the engine's values | `tests/test_arena.py`, 1e-12 |
 | Head-to-head matrix is antisymmetric (each pair evaluated in both seats and averaged) | same test |
 | Equilibrium never loses a match in the matrix | same test |
+| Seven labelled house strategies are always on the board (computed live, never stored) so a wiped database still leaves a leaderboard | same file |
 | Rejected with 422: wrong length, values outside [0,1], NaN, strings, nicknames over 20 chars or with other characters | same file; found and fixed a bug where a NaN submission crashed the response (now sanitized) |
 | Duplicate nickname 409; more than 10 submissions per minute per IP gets 429; admin delete needs `ADMIN_TOKEN` | same file |
 | Not yet verified: deployment, behaviour under real traffic, Docker image build | not run in my environment |

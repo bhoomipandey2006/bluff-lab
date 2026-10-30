@@ -38,3 +38,6 @@ Submit an entry from the site, reload, check it appears. Delete it: `curl -X DEL
 
 ## 5. Posting
 Link the live site and the repo. Quote only numbers from `docs/FACTS.md`. Say "to my knowledge" before any claim about what exists elsewhere.
+
+## Render notes (checked against Render's free-tier docs on 2026-10-30)
+Free web services sleep after 15 minutes without traffic (waking takes about a minute) and the local disk, including the SQLite file, is wiped on every sleep, restart or redeploy. So user entries on the free tier are temporary; the seven "House" strategies always come back because they are computed, not stored. Set `PORT` to `8000` if Render asks, plus the three variables in step 3.
